@@ -95,12 +95,12 @@ type ResMessage struct {
 	// TODO: Execution interface{} `json:"execution"`
 }
 
-func (p *ProcessDefinition) SendMessage(reqMsg ResMessage) (resMsg []*ResMessage, err error) {
-	res, err := p.client.doPostJson("/message", map[string]string{}, reqMsg)
+func (m *Message) SendMessage(reqMsg ResMessage) (resMsg []*ResMessage, err error) {
+	res, err := m.client.doPostJson("/message", map[string]string{}, reqMsg)
 	if err != nil {
 		return
 	}
 
-	err = p.client.readJsonResponse(res, &resMsg)
+	err = m.client.readJsonResponse(res, &resMsg)
 	return
 }

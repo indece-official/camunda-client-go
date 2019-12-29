@@ -95,7 +95,7 @@ type ResMessage struct {
 	// TODO: Execution interface{} `json:"execution"`
 }
 
-func (m *Message) SendMessage(reqMsg ResMessage) (resMsg []*ResMessage, err error) {
+func (m *Message) SendMessage(reqMsg ReqMessage) (resMsg []*ResMessage, err error) {
 	res, err := m.client.doPostJson("/message", map[string]string{}, reqMsg)
 	if err != nil {
 		return

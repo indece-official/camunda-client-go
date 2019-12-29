@@ -45,16 +45,6 @@ type ReqMessage struct {
 	// Local variables of child executions (such as in subprocesses) are not considered!
 	CorrelationKeys *map[string]CorrelationKey `json:"correlationKeys,omitempty"`
 
-	// LocalCorrelationKeys	 are local variables used for correlation of executions
-	// (process instances) that wait for incoming messages. Has to be a JSON object
-	// containing key-value pairs that are matched against local variables during
-	// correlation. Each key is a variable name and each value a JSON variable value object
-	// with the following properties.
-	//
-	// Note: Only variable values that are defined in the execution scope are taken into
-	// account, without taking outer (parent) scopes.
-	LocalCorrelationKeys *map[string]CorrelationKey `json:"localCorrelationKeys,omitempty"`
-
 	// ProcessVariables	is a map of variables that is injected into the triggered execution
 	// or process instance after the message has been delivered. Each key is a variable
 	// name and each value a JSON variable value object with the following properties.
@@ -68,39 +58,14 @@ type ReqMessage struct {
 	// value is set to true, the message will be correlated to multiple executions and a
 	// process definition that can be instantiated by this message in one go.
 	All *bool `json:"all,omitempty"`
-
-	// ResultEnabled is a boolean value that indicates whether the result of the
-	// correlation should be returned or not. If this property is set to true, there will
-	// be returned a list of message correlation result objects. Depending on the all
-	// property, there will be either one ore more returned results in the list.
-	//
-	// The default value is false, which means no result will be returned.
-	ResultEnabled *bool `json:"resultEnabled,omitempty"`
 }
 
-type ResMessage struct {
-	// ResultType indicates if the message was correlated to a message start event
-	// or an intermediate message catching event. In the first case, the resultType
-	// is ProcessDefinition and otherwise Execution.
-	ResultType string `json:"resultType"`
-
-	// This property only has a value if the resultType is set to ProcessDefinition.
-	// The processInstance with the properties as described in the get single
-	// instance method.
-	// TODO: ProcessInstance interface{} `json:"processInstance"`
-
-	// This property only has a value if the resultType is set to Execution. The
-	// execution with the properties as described in the get single execution
-	// method.
-	// TODO: Execution interface{} `json:"execution"`
-}
-
-func (m *Message) SendMessage(reqMsg ReqMessage) (resMsg ResMessage, err error) {
+func (m *Message) SendMessage(reqMsg ReqMessage) (err error) {
 	res, err := m.client.doPostJson("/message", map[string]string{}, reqMsg)
 	if err != nil {
 		return
 	}
 
-	err = m.client.readJsonResponse(res, &resMsg)
+	err = m.client.checkResponse(res)
 	return
 }
